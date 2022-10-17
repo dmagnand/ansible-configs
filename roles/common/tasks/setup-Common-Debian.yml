@@ -1,0 +1,39 @@
+- name: Update package cache
+  pacman:
+    update_cache: yes
+- name: Install core packages
+  pacman:
+    name:
+      - logrotate
+      - mlocate
+    state: present
+- name: Start and enable systemd-timesyncd
+  systemd:
+    name: systemd-timesyncd
+    state: started
+    enabled: yes
+- name: Generate locales
+  locale_gen:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - fr_FR.UTF-8
+- name: Configure locales
+  template:
+    dest: /etc/locale.conf
+    group: root
+    mode: 0644
+    owner: root
+    src: locale.conf.j2
+- name: Configure logrotate
+  template:
+    dest: /etc/logrotate.conf
+    group: root
+    mode: 0644
+    owner: root
+    src: logrotate.conf.j2
+- name: Enable logrotate timer
+  systemd:
+    name: logrotate.timer
+    state: started
+    enabled: yes

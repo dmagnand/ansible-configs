@@ -1,0 +1,112 @@
+
+- name: Install needed common applications
+  become: true
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ packages_install_common }}"
+  when: packages_install_common is defined
+- name: Remove unneeded or conflicting applications
+  become: true
+  package:
+    name: "{{ item }}"
+    state: absent
+    force: yes
+  with_items: "{{ packages_remove_common }}"
+  when: packages_remove_common is defined
+- name: Install needed applications
+  become: true
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ packages_install_after_common }}"
+  when: packages_install_after_common is defined
+
+- name: Install flatpak packages
+  become: true
+  package:
+    name:
+      - flatpak
+    state: present
+
+- name: set language flatpak
+  ansible.builtin.shell:
+    cmd: flatpak config --set languages "fr"
+
+- name: Flatpak applications...
+  ansible.builtin.debug:
+    msg: "It may take time..."
+    
+- name: Install flatpak applications
+  community.general.flatpak:
+    name: "{{ item  }}"
+    state: present
+  with_items: "{{ packages_install_flatpak }}"
+  when: packages_install_flatpak is defined
+
+- name: Install flatpak flatpakref applications
+  ansible.builtin.shell:
+    cmd: flatpak install -y --noninteractive --reinstall --from {{ item }} >/dev/null 2>&1 & echo 0
+  with_items: "{{ packages_install_flatpakref }}"
+  when: packages_install_flatpakref is defined
+
+- name: create directory /var/lib/machines 
+  file:
+    state: directory
+    path: "/var/lib/machines"
+
+- name: create directory /var/lib/libvirt
+  file:
+    state: directory
+    path: "/var/lib/libvirt"
+
+- name: Disable BTRFS quotas & chattr + C for VM / Container directories
+  shell: btrfs quota disable / && chattr +C /var/lib/machines && chattr +C /var/lib/libvirt
+
+- name: Install Vimix Grub Theme
+  become: yes
+  ansible.builtin.shell:
+    cmd: if [ -e "/boot/grub/themes/Vimix/theme.txt" ]; then exit 0; fi && mkdir -p /tmp/vimix && cd /tmp/vimix/ && git clone https://github.com/vinceliuice/grub2-themes.git && cd /tmp/vimix/grub2-themes && sudo ./install.sh -b -t tela -s 1080p && rm -Rf /tmp/vimix
+  tags:
+    - grubinstall
+
+
+###################
+# profile picture #
+###################
+
+- name: download profile picture
+  become: true
+  ansible.builtin.copy:
+    src: arch_logo_96.png
+    dest: /var/lib/AccountsService/icons/{{ user }}
+    owner: {{ user }}
+    group: {{ user }}
+    mode: '0644'
+    backup: yes
+    force: true
+
+- name: set profile picture
+  become: true
+  lineinfile:
+    path: /var/lib/AccountsService/users/{{ user }}
+    regexp: '^Icon='
+    line: 'Icon=/var/lib/AccountsService/icons/{{ user }}'
+
+
+# - name: Restore home...
+#   ansible.builtin.debug:
+#     msg: "It may take time..."
+#   tags:
+#     - homeconfiguration
+    
+# - name: Restore home 
+#   copy:
+#     src: home/{{ user }}
+#     dest: /home
+#     directory_mode:
+#     group: {{ user }}
+#     mode: 0700
+#     owner: {{ user }}
+#   tags:
+#     - homeconfiguration

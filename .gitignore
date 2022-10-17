@@ -1,3 +1,4 @@
 .vault_pass
 node_modules/
+roles/workstations/files/home/davy/
 yarn.lock

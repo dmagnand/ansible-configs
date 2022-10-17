@@ -1,0 +1,94 @@
+###############################
+######  Debian Family OS ######
+###############################
+
+# WIP
+- name: Install hblock
+  become: true
+  ansible.builtin.shell:
+    cmd: cp /etc/hosts /etc/hosts.preserve && curl -o /tmp/hblock 'https://raw.githubusercontent.com/hectorm/hblock/v3.4.0/hblock'   && echo '4031d86cd04fd7c6cb1b7e9acb1ffdbe9a3f84f693bfb287c68e1f1fa2c14c3b  /tmp/hblock' | shasum -c   && sudo mv /tmp/hblock /usr/local/bin/hblock   && sudo chown 0:0 /usr/local/bin/hblock   && sudo chmod 755 /usr/local/bin/hblock
+
+- name: Install hblock.timer in systemd
+  become: true
+  ansible.builtin.shell:
+    cmd: sudo curl -o '/tmp/hblock.#1' 'https://raw.githubusercontent.com/hectorm/hblock/v3.4.0/resources/systemd/hblock.{service,timer}' && echo '45980a80506df48cbfa6dd18d20f0ad4300744344408a0f87560b2be73b7c607  /tmp/hblock.service' | shasum -c && echo '87a7ba5067d4c565aca96659b0dce230471a6ba35fbce1d3e9d02b264da4dc38  /tmp/hblock.timer' | shasum -c && sudo mv /tmp/hblock.{service,timer} /etc/systemd/system/ && sudo chown 0:0 /etc/systemd/system/hblock.{service,timer} && sudo chmod 644 /etc/systemd/system/hblock.{service,timer} && sudo systemctl daemon-reload && sudo systemctl enable hblock.timer && sudo systemctl start hblock.timer
+
+- name: Update packages to the latest version
+  apt:
+    update_cache: yes
+    upgrade: yes
+
+- name: Enable Systemd system services
+  systemd:
+    name: "{{ item }}"
+    state: started
+  loop:
+    - hblock.timer
+    - ufw
+
+
+####################
+# gnome workstation # 
+####################
+
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Print the package facts
+  ansible.builtin.debug:
+    var: ansible_facts.packages
+
+- name: Check whether a package called foobar is installed
+  ansible.builtin.debug:
+    msg: "{{ ansible_facts.packages['gnome-session-bin'] | length }} versions of gnome-session-bin are installed!"
+  when: "'gnome-session' in ansible_facts.packages"
+
+- name: install gnome.yml playbook requirements
+  become: true
+  package:
+    name:
+      - dconf
+      - dconf-editor
+      - python-psutil
+      - dbus-python
+      - gnome-tweaks
+  when: "'gnome-session-bin' in ansible_facts.packages"
+
+####################
+# gnome extensions via pacman / apt # 
+####################
+
+- name: install gnome extensions from packages
+  become: true
+  package:
+    name:
+      - gnome-shell-extension-alt-tab-raise-first-window
+      - gnome-shell-extension-always-show-workspaces
+      - gnome-shell-extension-appindicator
+      - gnome-shell-extension-desktop-icons-ng
+      - gnome-shell-extension-prefs
+      - gnome-shell-extension-gsconnect
+  when: "'gnome-session-bin' in ansible_facts.packages"
+
+####################
+# gnome extensions via pacman / apt # 
+####################
+
+- name: install gnome extensions from packages
+  become: true
+  package:
+    name:
+      - gnome-shell-extension-pop-shell-git
+      - gnome-shell-extension-x11gestures
+  when: "'gnome-session-bin' in ansible_facts.packages"
+  tags:
+    - gnome
+
+- name: Install gnome-shell-extension-installer
+  become: true
+  ansible.builtin.shell:
+    cmd: cd /tmp/ && wget -O gnome-shell-extension-installer "https://github.com/brunelli/gnome-shell-extension-installer/raw/master/gnome-shell-extension-installer" && chmod +x /tmp/gnome-shell-extension-installer && mv /tmp/gnome-shell-extension-installer /usr/bin/
+  when: "'gnome-session-bin' in ansible_facts.packages"
+  tags:
+    - gnome

@@ -1,0 +1,93 @@
+#Base variables
+actual_hostname: id013672l
+ansible_host: localhost
+cachyos_v3: false
+testing: false
+
+packages_install:
+  - acpi_call-dkms
+  - ananicy-cpp
+  - ananicy-rules-git
+  - android-tools
+  - ansible
+  - breeze-grub
+  - btop-git
+  - duperemove
+  - hunspell-fr
+  - hyphen-fr
+  - ipman
+  - jdk11-temurin
+  - libinput-gestures
+  - nextcloud-client-git
+  - ripgrep-git
+  - speedcrunch
+  - thunderbird-appmenu
+  - vscodium
+  - whoogle-git
+  - audacity
+  - filezilla
+  - firefox
+  - flowblade
+  - gimagereader
+  - tilix
+  - grub-customizer
+  - gtkhash
+  - gufw
+  - handbrake
+  - icedtea-web
+  - imagemagick
+  - inkscape
+  - kazam
+  - keepassxc
+  - lutris
+  - mkvtoolnix-gui
+  - notepadqq
+  - pavucontrol
+  - playonlinux
+  - remmina
+  - stacer
+  - steam
+  - thunderbird
+  - virt-manager
+  - httrack
+  - xsane
+  - zim
+packages_remove:
+  - starship
+packages_install_after:
+  - alpm_octopi_utils-git
+  - exa-git
+  - fish-git
+  - wireplumber-git
+  - jamesdsp-git
+  - lib32-mesa-tkg-git
+  - linux-tkg-cfs-lto_v3
+  - linux-tkg-cfs-lto_v3-headers
+  - mesa-tkg-git
+  - octopi-git
+  - starship-git
+  - xf86-video-amdgpu
+  - zram-generator-git
+packages_install_flatpak:
+  - chat.rocket.RocketChat
+  - com.anydesk.Anydesk
+  - com.borgbase.Vorta
+  - com.github.jeromerobert.pdfarranger
+  - com.github.tchx84.Flatseal
+  - com.jetbrains.DataGrip
+  - com.jgraph.drawio.desktop
+  - com.sweethome3d.Sweethome3d
+  - com.xnview.XnConvert
+  - com.xnview.XnViewMP
+  - io.dbeaver.DBeaverCommunity
+  - io.freetubeapp.FreeTube
+  - org.chromium.Chromium
+  - org.darktable.Darktable
+  - org.flameshot.Flameshot
+  - org.gimp.GIMP
+  - org.gnome.gitg
+  - org.kde.okular
+  - org.libreoffice.LibreOffice
+  - org.pitivi.Pitivi
+  - org.qownnotes.QOwnNotes
+  - re.sonny.Tangram

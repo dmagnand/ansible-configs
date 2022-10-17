@@ -1,0 +1,27 @@
+---
+- hosts:
+    - id013672l
+  become: yes
+  gather_facts: yes
+  collections:
+    - devsec.hardening
+  roles:
+    - devsec.hardening.os_hardening
+    - devsec.hardening.ssh_hardening
+  vars:
+    sysctl_overwrite:
+      net.ipv4.ip_forward: 0
+      net.ipv4.tcp_timestamps: 0
+      os_desktop_enable: true
+      os_auth_retries: 6
+      os_auth_lockout_time: 60
+      os_filesystem_whitelist: [vfat]
+      os_auditd_max_log_file_action: rotate
+    ssh_allow_users: 
+      - "davy"
+    ssh_allow_groups: 
+      - "davy"
+
+
+
+

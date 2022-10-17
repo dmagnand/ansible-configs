@@ -1,0 +1,274 @@
+#################################################################
+# Configuration de Gnome via Ansible                            #
+# Ce role doit etre lancé dans l'environnement utilisateur  #
+#                                                               #
+#################################################################
+
+# https://docs.ansible.com/ansible/latest/modules/dconf_module.html
+#
+# To determine what dconf keys and values to use, you can run `dconf watch /`
+# in a terminal as you make changes in settings or tweaks.  You can also use
+# `dconf read <key>` and `dconf write <key> <value>` to experiment with various
+# settings.  The dconf-editor application is also useful for exploring various
+# keys along with their descriptions.
+
+
+- name: Activate Alt-F2
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/shell/development-tools"
+    value: "true"
+
+
+#############
+# shortcuts #
+#############
+
+# There are many built-in shortcut actions that only require setting a
+# binding to enable.
+
+- name: Raccourci pour verrouiller l’écran. <Super>Escape
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/settings-daemon/plugins/media-keys/screensaver"
+    value: "['<Super>Escape']"
+
+- name: web browser shortcut
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/settings-daemon/plugins/media-keys/www"
+    value: "['<Super>w']"
+
+#########
+# power #
+#########
+
+- name: never blank screen
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/session/idle-delay"
+    value: "uint32 0"
+
+- name: inactive timeout
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/settings-daemon/plugins/power/sleep-inactive-ac-type"
+    value: "'nothing'"
+
+- name: inactive timeout on battery
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/settings-daemon/plugins/power/sleep-inactive-battery-type"
+    value: "'nothing'"
+
+- name: show battery percentage
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/interface/show-battery-percentage"
+    value: "true"
+
+
+#################
+# date and time #
+#################
+
+- name: automatic timezone
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/datetime/automatic-timezone"
+    value: "true"
+
+- name: clock show date
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/interface/clock-show-date"
+    value: "true"
+    state: present
+
+- name: clock format
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/interface/clock-format"
+    value: "'24h'"
+
+- name: affcher Jour de la semaine
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/interface/clock-show-weekday"
+    value: "true"
+
+
+############
+# behavior #
+############
+
+- name: workspaces span displays
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/mutter/workspaces-only-on-primary"
+    value: "false"
+
+- name: app-switcher on the current workspace only
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/shell/app-switcher/current-workspace-only"
+    value: "false"
+
+- name: detach modal dialogs
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/shell/overrides/attach-modal-dialogs"
+    value: "false"
+
+- name: automount
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/media-handling/automount"
+    value: "true"
+
+- name: area click method areas/fingers
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/peripherals/touchpad/click-method"
+    value: "'fingers'"
+
+- name: disable natural scrolling
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/peripherals/touchpad/natural-scroll"
+    value: "false"
+
+- name: enable two-finger scrolling
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/peripherals/touchpad/two-finger-scrolling-enabled"
+    value: "true"
+
+- name: enable subpixel antialiasing rgba/grayscale
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/settings-daemon/plugins/xsettings/antialiasing"
+    value: "'rgba'"
+
+- name: disable hot corner
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/interface/enable-hot-corners"
+    value: "false"
+
+- name: numlock on
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/peripherals/keyboard/numlock-state"
+    value: "true"
+
+- name: remember numlock state
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/peripherals/keyboard/remember-numlock-state"
+    value: "true"
+
+
+# Only works on X11, not Wayland.
+
+- name: middle click titlebar to lower
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/wm/preferences/action-middle-click-titlebar"
+    value: "'lower'"
+
+- name: double click titlebar to maximize
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/wm/preferences/action-double-click-titlebar"
+    value: "'toggle-maximize'"
+
+- name: minimize,maximize,close
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/wm/preferences/button-layout"
+    value: "'appmenu:minimize,maximize,close'"
+
+
+###################
+# Icons Themes  #
+###################
+
+- name: Install Gnome Icons packages 1
+  become_user: {{ user }}
+  shell:
+        " mkdir -p /home/{{ user }}/tmp && cd /home/{{ user }}/tmp && wget -N https://raw.githubusercontent.com/zayronxio/Zafiro-icons/master/Install-Zafiro-Icons.sh && chmod +x Install-Zafiro-Icons.sh "
+
+- name: Install Gnome Icons packages 2
+  become_user: {{ user }}
+  shell:
+        " bash /home/{{ user }}/tmp/Install-Zafiro-Icons.sh > /dev/null 2>&1 ; exit 0 "
+
+- name: Ensure that icons was installed
+  become_user: {{ user }}
+  stat:
+    path: "/home/{{ user }}/.local/share/icons/Zafiro-Icons-Dark"
+  register: path_icons
+
+- name: Apply Zafiro
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/desktop/interface/icon-theme"
+    value: "'Zafiro-Icons-Dark'"
+  when: path_icons.stat.exists and path_icons.stat.isdir
+
+
+###################
+# Dark   Theme  #
+###################
+
+- name: Switch to dark themes #default for light #prefer-dark for Dark
+  ansible.builtin.shell:
+    cmd: gsettings set org.gnome.desktop.interface color-scheme prefer-dark 
+
+
+###################
+# Gnome extension #
+###################
+
+- name: Activate user extensions
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/shell/disable-user-extensions"
+    value: "false"
+
+- name: Install Gnome extension
+  become: yes
+  ansible.builtin.shell:
+    cmd: {{ item }}
+  with_items:
+    - gnome-shell-extension-installer 307 #dash-to-dock
+    - gnome-shell-extension-installer 3193 #blur-my-shell
+    - gnome-shell-extension-installer 1460 #vitals
+    - gnome-shell-extension-installer 302 #windowoverlay-icons
+
+- name: Enable extensions installed
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/shell/enabled-extensions"
+    value: "[ 'dash-to-dock@micxgx.gmail.com' , 'blur-my-shell@aunetx', 'Vitals@CoreCoding.com', 'windowoverlay-icons@sustmidown.centrum.cz']"
+
+- name: Restore extension settings (1)
+  copy:
+    src: backup_*.dconf
+    dest: /tmp
+
+- name: Restore extension settings (2)
+  ansible.builtin.shell:
+    cmd: dconf load /org/gnome/shell/extensions/dash-to-dock/ < /tmp/backup_dash-to-dock.dconf && dconf load /org/gnome/shell/extensions/blur-my-shell/ < /tmp/backup_blur-my-shell.dconf && dconf load /org/gnome/shell/extensions/vitals/ < /tmp/backup_vitals.dconf
+
+#############
+# Favorite Apps #
+#############
+
+- name: Favorite Apps
+  become_user: {{ user }}
+  community.general.dconf:
+    key: "/org/gnome/shell/favorite-apps"
+    value: "['firefox.desktop', 'org.chromium.Chromium.desktop', 're.sonny.Tangram.desktop', 'org.gnome.Nautilus.desktop', 'com.gexperts.Tilix.desktop', 'org.remmina.Remmina.desktop', 'org.libreoffice.LibreOffice.writer.desktop', 'org.libreoffice.LibreOffice.calc.desktop', 'org.gnome.Calculator.desktop', 'io.dbeaver.DBeaverCommunity.desktop', 'com.jetbrains.DataGrip.desktop', 'org.qownnotes.QOwnNotes.desktop', 'zim.desktop', 'keepass2.desktop', 'thunderbird.desktop', 'chat.rocket.RocketChat.desktop', 'ike.desktop', 'codium.desktop', 'notepadqq.desktop']"
+

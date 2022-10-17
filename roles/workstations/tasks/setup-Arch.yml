@@ -1,0 +1,153 @@
+
+- name: Install pacman config
+  template:
+    dest: /etc/pacman.conf
+    group: root
+    mode: 0644
+    owner: root
+    src: pacman.conf.j2
+
+- name: Update packages to the latest version
+  pacman:
+    update_cache: yes
+    upgrade: yes
+
+- name: Install needed applications
+  pacman:
+    name: "{{ packages_install_arch }}"
+    state: present
+  with_items: "{{ packages_install_arch }}"
+  when: packages_install_arch is defined
+- name: Remove unneeded or conflicting applications
+  pacman:
+    name: "{{ packages_remove }}"
+    state: absent
+    force: yes
+  with_items: "{{ packages_remove }}"
+  when: packages_remove is defined
+- name: Install needed applications
+  pacman:
+    name: "{{ packages_install_arch_after  }}"
+    state: present
+  with_items: "{{ packages_install_arch_after }}"
+  when: packages_install_arch_after is defined
+
+- name: Enable Systemd system services
+  systemd:
+    name: "{{ item }}"
+    state: started
+  loop:
+    - hblock.timer
+    - ufw
+
+###########################
+# Yay AUR package manager # 
+###########################
+
+- name: Install Yay AUR package manager
+  ansible.builtin.shell:
+    cmd: cd /tmp && git clone https://aur.archlinux.org/yay.git && cd /tmp/yay && makepkg -si --noconfirm
+  tags:
+    - yayinstall
+
+- name: Install AUR packages defined in packages_install_arch_aur var. ike shrew-vpn-client...
+  ansible.builtin.shell:
+    cmd: echo y | LANG=C yay --noprovides --answerdiff None --answerclean None --mflags "--noconfirm" -S "{{ item }}"
+  with_items: "{{ packages_install_arch_aur }}"
+  tags:
+    - yayinstall
+
+
+####################
+# gnome workstation # 
+####################
+
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Print the package facts
+  ansible.builtin.debug:
+    var: ansible_facts.packages
+
+- name: Check whether a package called foobar is installed
+  ansible.builtin.debug:
+    msg: "{{ ansible_facts.packages['gnome-session'] | length }} versions of gnome-session are installed!"
+  when: "'gnome-session' in ansible_facts.packages"
+  tags:
+    - gnome
+    
+- name: install gnome.yml playbook requirements
+  become: true
+  package:
+    name:
+      - dconf
+      - dconf-editor
+      - python-psutil
+      - dbus-python
+      - gnome-tweaks
+  when: "'gnome-session' in ansible_facts.packages"
+  tags:
+    - gnome
+
+
+########################################
+# gnome extensions via pacman / apt # 
+########################################
+
+- name: install gnome extensions from packages
+  become: true
+  package:
+    name:
+      - gnome-shell-extension-pop-shell-git
+      - gnome-shell-extension-x11gestures
+  when: "'gnome-session' in ansible_facts.packages"
+  tags:
+    - gnome
+
+- name: Install gnome-shell-extension-installer
+  become: true
+  ansible.builtin.shell:
+    cmd: cd /tmp/ && wget -O gnome-shell-extension-installer "https://github.com/brunelli/gnome-shell-extension-installer/raw/master/gnome-shell-extension-installer" && chmod +x /tmp/gnome-shell-extension-installer && mv /tmp/gnome-shell-extension-installer /usr/bin/
+  when: "'gnome-session-bin' in ansible_facts.packages"
+    tags:
+      - gnome
+
+
+# ## Warning: It takes >2Go of /tmp !!!!
+# ## Install Fonts
+# - name: Update Fonts from git
+#   ansible.builtin.shell:
+#     cmd: cd /tmp && git clone --origin origin --depth 1 https://github.com/ryanoasis/nerd-fonts.git && cd /tmp/nerd-fonts
+#   tags:
+#     - fontsinstall
+    
+# - name: Select fonts to install
+#   ansible.builtin.find:
+#     recurse: yes
+#     use_regex: yes
+#     paths: "/tmp/nerd-fonts/patched-fonts"
+#     patterns:
+#       - '^.*?((?!Windows).)*?\.ttf$'
+#   register: fonts_to_install
+#   tags:
+#     - fontsinstall
+    
+# #- debug: var=fonts_to_install
+# - name: Copy fonts to home
+#   ansible.builtin.copy:
+#     dest: "/usr/share/fonts/{{ item.path | basename }}"
+#     src: "{{ item.path }}"
+#     mode: 0744
+#     remote_src: yes
+#   loop: "{{ fonts_to_install.files }}"
+#   notify:
+#     - update font cache
+#   tags:
+#     - fontsinstall
+
+# - name: Refresh Fonts
+#   ansible.builtin.shell:
+#     cmd: fc-cache && rm -Rf /tmp/nerd-fonts
+#   tags:
+#     - fontsinstall

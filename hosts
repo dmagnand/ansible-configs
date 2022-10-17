@@ -1,11 +1,12 @@
 [all:vars]
-ansible_connection = ssh
-ansible_user = nico
+ansible_connection = local
+ansible_user = ansible
+sftp_enabled = true
 
 [workstations]
-slim-7
+localhost
 
-[servers]
-dragons-lair
-t440p
-web-dragon
+[gnome]
+localhost
+
+

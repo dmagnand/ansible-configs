@@ -1,5 +1,0 @@
----
-cf_sync_ip: false
-dl_git: false
-goaccess: false
-nginx_config_dir: /var/cache/{{ inventory_hostname }}/nginx/configs

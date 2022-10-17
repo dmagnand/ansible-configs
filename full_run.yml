@@ -1,19 +1,13 @@
 ---
-- hosts: all
-  gather_facts: no
+- hosts: all 
+  gather_facts: true
   become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
   tasks:
     - import_role:
         name: common
     - import_role:
-        name: servers
-      when: "'servers' in group_names"
-    - import_role:
         name: workstations
       when: "'workstations' in group_names"
-    - import_role:
-        name: docker_compose
-      when: docker_compose | default(false) == true
-    - import_role:
-        name: letsencrypt
-      when: letsencrypt_domain is defined
+      

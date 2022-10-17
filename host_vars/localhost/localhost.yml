@@ -1,0 +1,101 @@
+#Base variables
+actual_hostname: localhost
+ansible_host: localhost
+cachyos_v3: false
+testing: false
+user: davy
+
+packages_install_common:
+  - android-tools
+  - git
+  - hunspell-fr
+  - hyphen-fr
+  - libreoffice-fresh
+  - libreoffice-fresh-fr
+  - ripgrep
+  - vscodium
+  - audacity
+  - filezilla
+  - firefox
+  - flowblade
+  - tilix
+  - gufw
+  - handbrake
+  - icedtea-web
+  - imagemagick
+  - inkscape
+  - kazam
+  - keepassxc
+  - lutris
+  - notepadqq
+  - mp3splt
+  - pavucontrol
+  - playonlinux
+  - remmina
+  - scrcpy
+  - stacer
+  - steam
+  - thunderbird
+  - ufw
+  - virt-manager
+  - xsane
+  - xclip
+  - zim
+packages_install_arch:
+  - base-devel
+  - bat
+  - btop
+  - exa
+  - libinput-gestures
+  - nextcloud-client-git
+  - nnn
+  - gimagereader-qt
+  - hblock
+  - perl_image_exiftool
+  - gtkhash
+  - icedtea-web
+  - mkvtoolnix-gui
+  - httrack
+packages_install_debian:
+  - exiftool
+  - bat
+  - nextcloud-client
+  - gimagereader
+  - mkvtoolnix
+  - openjdk-8-jre
+packages_install_arch_after:
+  - nerd-fonts-jetbrains-mono
+  - trash-cli
+packages_install_debian_after:
+  - nerd-fonts-jetbrains-mono
+  - trash-cli
+packages_install_arch_aur:
+  - ike
+  - shrew-vpn-client
+  - keepass2
+  - gnome-shell-extension-installer
+
+packages_install_flatpak:
+  - chat.rocket.RocketChat
+  - com.anydesk.Anydesk
+  - com.borgbase.Vorta
+  - com.github.jeromerobert.pdfarranger
+  - com.github.tchx84.Flatseal
+  - com.jetbrains.DataGrip
+  - com.jgraph.drawio.desktop
+  - com.sweethome3d.Sweethome3d
+  - com.xnview.XnConvert
+  - com.xnview.XnViewMP
+  - io.dbeaver.DBeaverCommunity
+  - io.freetubeapp.FreeTube
+  - org.chromium.Chromium
+  - org.darktable.Darktable
+  - org.flameshot.Flameshot
+  - org.gnome.gitg
+  - org.kde.okular
+  - org.pitivi.Pitivi
+  - org.qownnotes.QOwnNotes
+  - re.sonny.Tangram
+packages_install_flatpakref:
+  - https://flathub.org/beta-repo/appstream/org.gimp.GIMP.flatpakref
+
