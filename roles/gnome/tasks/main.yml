@@ -237,30 +237,38 @@
     key: "/org/gnome/shell/disable-user-extensions"
     value: "false"
 
-- name: Install Gnome extension
-  become: yes
+- name: Check that Gnome extension exists
+  stat:
+    path: /usr/bin/gnome-shell-extension-installer
+  register: gnomeshellextensioninstallerfile
+
+- name: Install Gnome extension #dash-to-dock #blur-my-shell #vitals #windowoverlay-icons 812
   ansible.builtin.shell:
-    cmd: {{ item }}
+    cmd: gnome-shell-extension-installer {{ item }}
   with_items:
-    - gnome-shell-extension-installer 307 #dash-to-dock
-    - gnome-shell-extension-installer 3193 #blur-my-shell
-    - gnome-shell-extension-installer 1460 #vitals
-    - gnome-shell-extension-installer 302 #windowoverlay-icons
+    - 307
+    - 3193
+    - 1460
+  when: gnomeshellextensioninstallerfile.stat.exists
 
 - name: Enable extensions installed
-  become_user: {{ user }}
   community.general.dconf:
     key: "/org/gnome/shell/enabled-extensions"
-    value: "[ 'dash-to-dock@micxgx.gmail.com' , 'blur-my-shell@aunetx', 'Vitals@CoreCoding.com', 'windowoverlay-icons@sustmidown.centrum.cz']"
+    value: "[ 'dash-to-dock@micxgx.gmail.com' , 'blur-my-shell@aunetx', 'Vitals@CoreCoding.com']"
+  when: gnomeshellextensioninstallerfile.stat.exists
 
 - name: Restore extension settings (1)
   copy:
-    src: backup_*.dconf
+    src: "{{ item }}"
     dest: /tmp
+  with_fileglob: 
+    - "backup_*.dconf"
+  when: gnomeshellextensioninstallerfile.stat.exists
 
 - name: Restore extension settings (2)
   ansible.builtin.shell:
     cmd: dconf load /org/gnome/shell/extensions/dash-to-dock/ < /tmp/backup_dash-to-dock.dconf && dconf load /org/gnome/shell/extensions/blur-my-shell/ < /tmp/backup_blur-my-shell.dconf && dconf load /org/gnome/shell/extensions/vitals/ < /tmp/backup_vitals.dconf
+  when: gnomeshellextensioninstallerfile.stat.exists
 
 #############
 # Favorite Apps #

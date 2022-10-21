@@ -31,6 +31,7 @@ packages_install_common:
   - mp3splt
   - pavucontrol
   - playonlinux
+  - pwgen
   - remmina
   - scrcpy
   - stacer
@@ -54,13 +55,17 @@ packages_install_arch:
   - perl_image_exiftool
   - gtkhash
   - icedtea-web
+  - keepass
   - mkvtoolnix-gui
   - httrack
+  - webp-pixbuf-loader
+  - xorg-drivers
 packages_install_debian:
   - exiftool
   - bat
   - nextcloud-client
   - gimagereader
+  - keepass2
   - mkvtoolnix
   - openjdk-8-jre
 packages_install_arch_after:
@@ -71,8 +76,7 @@ packages_install_debian_after:
   - trash-cli
 packages_install_arch_aur:
   - ike
-  - shrew-vpn-client
-  - keepass2
+  - shrew-vpn-client-qt5
   - gnome-shell-extension-installer
 
 packages_install_flatpak:
